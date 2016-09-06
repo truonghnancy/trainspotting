@@ -8,6 +8,7 @@ public class Lab1 {
 
   public Lab1(Integer speed1, Integer speed2) {
     TSimInterface tsi = TSimInterface.getInstance();
+    tsi.setDebug(false);
     semaphores = new ArrayList<Semaphore>();
     for(int i = 0; i < 9; i++) {
        semaphores.add(new Semaphore(1));
@@ -45,13 +46,23 @@ class TrainThread extends Thread {
    }
 
    public void run() {
+    while (true) {
     try {
 
       tsi.setSpeed(trainNumber, speed);
+      SensorEvent sensorEvent = tsi.getSensor(trainNumber);
+      if (sensorEvent.getStatus() == SensorEvent.ACTIVE) {
+         System.out.println(sensorEvent.toString());
+      }
     }
     catch (CommandException e) {
       e.printStackTrace();
       System.exit(1);
+    }
+    catch (InterruptedException e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
     }
    }
 }
