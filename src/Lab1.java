@@ -4,8 +4,8 @@ import java.lang.InterruptedException;
 import java.util.*;
 
 public class Lab1 {
-	int STOP = -1;
-	int DONOTHING = -2;
+	static int STOP = -1;
+	static int DONOTHING = -2;
 	static Boolean toUpper = true;
 	static Boolean toLower = false;
 	ArrayList<Semaphore> semaphores;
@@ -13,7 +13,9 @@ public class Lab1 {
 
 	public Lab1(Integer speed1, Integer speed2) {
 		TSimInterface tsi = TSimInterface.getInstance();
-		tsi.setDebug(false);
+		
+		
+		//tsi.setDebug(false);
 		semaphores = new ArrayList<Semaphore>();
 		for(int i = 0; i < 9; i++) {
 			semaphores.add(new Semaphore(1));
@@ -38,8 +40,8 @@ public class Lab1 {
 		sensorToSemaphore.put(312,  new SensorMapping(new int[] {6}, new int[] {STOP}));
 
 		try {
-			TrainThread train1 = new TrainThread(1, speed1, semaphores, true);
-			TrainThread train2 = new TrainThread(2, speed2, semaphores, false);
+			TrainThread train1 = new TrainThread(1, speed1, semaphores, true, sensorToSemaphore);
+			TrainThread train2 = new TrainThread(2, speed2, semaphores, false, sensorToSemaphore);
 
 			train1.start();
 			train2.start();
@@ -59,15 +61,16 @@ class TrainThread extends Thread {
 	private ArrayList<Semaphore> semaphores;
 	private TSimInterface tsi;
 	private boolean toLower;
-//	private Hashtable<Integer, Integer[]> sensorToSemaphore;
+	private Hashtable<Integer, SensorMapping> sensorToSemaphore;
 	
 
-	TrainThread(int trainNumber, int speed, ArrayList<Semaphore> semaphores, boolean toLower) {
+	TrainThread(int trainNumber, int speed, ArrayList<Semaphore> semaphores, boolean toLower, Hashtable<Integer, SensorMapping> sensorToSemaphore) {
 		this.trainNumber = trainNumber;
 		this.speed = speed;
 		this.semaphores = semaphores;
 		this.tsi = TSimInterface.getInstance();
 		this.toLower = toLower;
+		this.sensorToSemaphore = sensorToSemaphore;
 		
 		System.out.println("hello from train " + trainNumber);
 	}
@@ -82,69 +85,30 @@ class TrainThread extends Thread {
 
 					int x = sensorEvent.getXpos();
 					int y = sensorEvent.getYpos();
-					switch (x*100 + y) {
-					case 707:
-						// Semaphore 0, 2
-						break;
-					case 907:
-						// Semaphore 0, 2
-						break;
-					case 1607:
-						// Semaphore 0
-						break;
-					case 808:
-						// Semaphore 1, 2
-						break;
-					case 806:
-						// Semaphore 1, 2
-						break;
-					case 1708:
-						// Semaphore 1
-						break;
-					case 1807:
-						// Semaphore 3
-						break;
-					case 1609:
-						// Semaphore 3
-						break;
-					case 1510:
-						// Semaphore 4
-						break;
-					case 410:
-						// Semaphore 4
-						break;
-					case 1409:
-						// Semaphore 5
-						break;
-					case 509:
-						// Semaphore 5
-						break;
-					case 309:
-						// Semaphore 6
-						break;
-					case 211:
-						// Semaphore 6
-						break;
-					case 312:
-						// Semaphore 7
-						break;
-					case 411:
-						// Semaphore 8
-						if (toLower) {
-							
-						} else {
-							if (semaphores.get(6).tryAcquire()) {
-								tsi.setSwitch(3, 11, TSimInterface.SWITCH_LEFT);
+					int[] nextSemaphore = sensorToSemaphore.get(x*100+y).getSemaphore(toLower);
+					
+					if (nextSemaphore[0] == Lab1.STOP) {
+						tsi.setSpeed(trainNumber, 0);
+					} else if (nextSemaphore[0] == Lab1.DONOTHING) {
+						
+					} else {
+						for (int i = 0; i < nextSemaphore.length; i++) {
+							if (semaphores.get(nextSemaphore[i]).tryAcquire()) {
+								//tsi.setSwitch(x, y, TSimInterface.SWITCH_LEFT);
 								System.out.println("switch set");
-							} else {
-								tsi.setSpeed(trainNumber, 0);
-								semaphores.get(6).acquire();
-								tsi.setSpeed(trainNumber, speed);
-								
 							}
 						}
-						break;
 					}
+/*					
+					if (semaphores.get(6).tryAcquire()) {
+						tsi.setSwitch(3, 11, TSimInterface.SWITCH_LEFT);
+						System.out.println("switch set");
+					} else {
+						tsi.setSpeed(trainNumber, 0);
+						semaphores.get(6).acquire();
+						tsi.setSpeed(trainNumber, speed);
+						
+					}*/
 				}
 			}
 			catch (CommandException e) {
@@ -163,6 +127,7 @@ class SensorMapping {
 	// if either of these two is negative, train has to come to a stop
 	int[] acquireIfToUpper;
 	int[] acquireIfToLower;
+	int curSemaphore;
 	
 	public SensorMapping(int[] acquireIfToUpper, int[] acquireIfToLower) {
 		this.acquireIfToLower = acquireIfToLower;
