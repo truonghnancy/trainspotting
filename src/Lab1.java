@@ -24,9 +24,9 @@ public class Lab1 {
 		sensorToSemaphore = new Hashtable<Integer, SensorMapping>();
 		sensorToSemaphore.put(707,  new SensorMapping(new int[] {DONOTHING}, new int[] {2}));
 		sensorToSemaphore.put(907,  new SensorMapping(new int[] {2}, new int[] {DONOTHING}));
-		sensorToSemaphore.put(1607, new SensorMapping(new int[] {DONOTHING}, new int[] {3}));
 		sensorToSemaphore.put(808,  new SensorMapping(new int[] {2}, new int[] {DONOTHING}));
 		sensorToSemaphore.put(806,  new SensorMapping(new int[] {DONOTHING}, new int[] {2}));
+		sensorToSemaphore.put(1607, new SensorMapping(new int[] {DONOTHING}, new int[] {3}));
 		sensorToSemaphore.put(1708, new SensorMapping(new int[] {DONOTHING}, new int[] {3}));
 		sensorToSemaphore.put(1807, new SensorMapping(new int[] {0,1}, new int[] {DONOTHING}));
 		sensorToSemaphore.put(1609, new SensorMapping(new int[] {DONOTHING}, new int[] {4,5}));
@@ -126,17 +126,26 @@ public class Lab1 {
 				int lastSemaphore = -1;
 				while (true) {
 					SensorEvent sensorEvent = tsi.getSensor(trainNumber);
-					
 					int x = sensorEvent.getXpos();
 					int y = sensorEvent.getYpos();
 					SensorMapping sMap = sensorToSemaphore.get(x*100+y);
 					int[] nextSemaphores = sMap.getSemaphore(toLower);
 					
 					if (sensorEvent.getStatus() == SensorEvent.INACTIVE) {
-						if (nextSemaphores[0] == Lab1.STOP || nextSemaphores[0] == Lab1.DONOTHING) {
+//						if (nextSemaphores[0] == Lab1.STOP || nextSemaphores[0] == Lab1.DONOTHING) {
+						if (nextSemaphores[0] == Lab1.DONOTHING) {
 							if (lastSemaphore != -1) {
-								semaphores.get(lastSemaphore).release();
-								System.out.println(trainNumber + ": released " + lastSemaphore);
+								if (currentSemaphore != 2) {
+									if (lastSemaphore > 10) {
+										semaphores.get(2).release();
+										System.out.println(trainNumber + ": released 2");
+										lastSemaphore = lastSemaphore % 10;
+									}
+									semaphores.get(lastSemaphore).release();
+									System.out.println(trainNumber + ": released " + lastSemaphore);
+								} else {
+									System.out.println(trainNumber + ": DOING NOTHING");
+								}
 							} else
 								System.out.println("lastSemaphore == -1");
 						}
@@ -160,7 +169,12 @@ public class Lab1 {
 								if (semaphores.get(nextSemaphores[i]).tryAcquire()) {
 									acquired = true;
 									System.out.println(trainNumber + ": I have acquired! " + nextSemaphores[i]);
-									lastSemaphore = currentSemaphore;
+									if (lastSemaphore == 2) {
+										lastSemaphore *= 10;
+										lastSemaphore += currentSemaphore;
+									} else {
+										lastSemaphore = currentSemaphore;
+									}
 									currentSemaphore = nextSemaphores[i];
 									int nextSemaphore = nextSemaphores[i];
 									int switchCoords = getNextSwitch(x*100+y);
