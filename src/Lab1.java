@@ -117,63 +117,6 @@ public class Lab1 {
 			System.out.println("hello from train " + trainNumber);
 		}
 		
-/*		public void release(int sensor, boolean toLower) {
-			switch(sensor) {
-			case 211:
-				semaphores.get(7).release();
-				semaphores.get(8).release();
-				System.out.println(trainNumber + ": I have released " + 7);
-				System.out.println(trainNumber + ": I have released " + 8);
-				break;
-			case 312:
-			case 411:
-				semaphores.get(6).release();
-				System.out.println(trainNumber + ": I have released " + 6);
-				break;
-			case 309:
-			case 1609:
-				semaphores.get(4).release();
-				semaphores.get(5).release();
-				System.out.println(trainNumber + ": I have released " + 4);
-				System.out.println(trainNumber + ": I have released " + 5);
-				break;
-			case 410:
-			case 509:
-				semaphores.get(6).release();
-				System.out.println(trainNumber + ": I have released " + 6);
-				break;
-			case 1409:
-			case 1510:
-				semaphores.get(3).release();
-				System.out.println(trainNumber + ": I have released " + 3);
-				break;
-			case 1807:
-				semaphores.get(0).release();
-				semaphores.get(1).release();
-				System.out.println(trainNumber + ": I have released " + 0);
-				System.out.println(trainNumber + ": I have released " + 1);
-				break;
-			case 1607:
-			case 1708:
-				semaphores.get(3).release();
-				System.out.println(trainNumber + ": I have released " + 3);
-				break;
-			case 808:
-			case 907:
-				if (toLower)
-					semaphores.get(2).release();
-				System.out.println(trainNumber + ": I have released " + 2);
-				break;
-			case 806:
-			case 707:
-				if (!toLower)
-					semaphores.get(2).release();
-				System.out.println(trainNumber + ": I have released " + 2);
-				break;
-				
-			}
-		}*/
-
 		public void run() {
 			try {
 				boolean firstRound = true;
@@ -186,7 +129,6 @@ public class Lab1 {
 					
 					int x = sensorEvent.getXpos();
 					int y = sensorEvent.getYpos();
-//					release(x*100+y, toLower);
 					SensorMapping sMap = sensorToSemaphore.get(x*100+y);
 					int[] nextSemaphores = sMap.getSemaphore(toLower);
 					
@@ -218,9 +160,6 @@ public class Lab1 {
 								if (semaphores.get(nextSemaphores[i]).tryAcquire()) {
 									acquired = true;
 									System.out.println(trainNumber + ": I have acquired! " + nextSemaphores[i]);
-//									if (!((currentSemaphore == 0 || currentSemaphore == 1) && nextSemaphores[i] == 2)) {
-//										semaphores.get(currentSemaphore).release();
-//									}
 									lastSemaphore = currentSemaphore;
 									currentSemaphore = nextSemaphores[i];
 									int nextSemaphore = nextSemaphores[i];
@@ -237,8 +176,6 @@ public class Lab1 {
 								tsi.setSpeed(trainNumber, 0);
 								
 								semaphores.get(nextSemaphores[0]).acquire();
-//								semaphores.get(currentSemaphore).release();
-//								System.out.println(trainNumber + ": released " + currentSemaphore);
 								currentSemaphore = nextSemaphores[0];
 								
 								int nextSemaphore = nextSemaphores[0];
@@ -251,20 +188,8 @@ public class Lab1 {
 								}
 								
 								tsi.setSpeed(trainNumber, speed);
-								//acquire next sem
-								//accelerate
 							}
 						}
-						/*					
-					if (semaphores.get(6).tryAcquire()) {
-						tsi.setSwitch(3, 11, TSimInterface.SWITCH_LEFT);
-						System.out.println("switch set");
-					} else {
-						tsi.setSpeed(trainNumber, 0);
-						semaphores.get(6).acquire();
-						tsi.setSpeed(trainNumber, speed);
-
-					}*/
 					}
 				}
 			} catch (CommandException e1) {
@@ -297,48 +222,3 @@ class SensorMapping {
 		}
 	}
 }
-
-/*
-class SensorMapping {
-	// if either of these two is negative, train has to come to a stop
-	SDT acquireIfToUpper1;
-	SDT acquireIfToUpper2;
-	SDT acquireIfToLower1;
-	SDT acquireIfToLower2;
-//	int[] acquireIfToUpper;
-//	int[] acquireIfToLower;
-//	int curSemaphore;
-	int nextSwitchX;
-	int nextSwitchY;
-
-	public SensorMapping(int x, int y, SDT acquireIfToUpper1, SDT acquireIfToUpper2, SDT acquireIfToLower1,  SDT acquireIfToLower2) {
-		this.nextSwitchX = x;
-		this.acquireIfToLower1 = acquireIfToLower1;
-		this.acquireIfToLower2 = acquireIfToLower2;
-		this.acquireIfToUpper1 = acquireIfToUpper1;
-		this.acquireIfToUpper2 = acquireIfToUpper2;
-	}
-	public SDT getSemaphore(boolean toLower, int i) {
-		if (toLower) {
-			if (i==1) {
-				return acquireIfToLower1;
-			}
-			return acquireIfToLower2;
-		} else {
-			if (i==1) {
-				return acquireIfToUpper1;
-			}
-			return acquireIfToUpper2;
-		}
-	}
-}
-
-class SDT { 
-	  public final int nextSemaphore; 
-	  public final int switchDirection; 
-	  public SDT(int nextSemaphore, int switchDirection) { 
-	    this.nextSemaphore = nextSemaphore; 
-	    this.switchDirection = switchDirection; 
-	  } 
-	}
-}*/
