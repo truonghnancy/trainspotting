@@ -22,9 +22,6 @@ public class Lab1 {
 		}
 
 		sensorToSemaphore = new Hashtable<Integer, SensorMapping>();
-
-		sensorToSemaphore.put(707, new SensorMapping(new SDT(), new SDT(), new SDT(), new SDT()));
-
 		sensorToSemaphore.put(707,  new SensorMapping(new int[] {STOP}, new int[] {2}));
 		sensorToSemaphore.put(907,  new SensorMapping(new int[] {2}, new int[] {DONOTHING}));
 		sensorToSemaphore.put(1607, new SensorMapping(new int[] {DONOTHING}, new int[] {3}));
@@ -43,8 +40,8 @@ public class Lab1 {
 		sensorToSemaphore.put(312,  new SensorMapping(new int[] {6}, new int[] {STOP}));
 
 		try {
-			TrainThread train1 = new TrainThread(1, speed1, semaphores, true, sensorToSemaphore);
-			TrainThread train2 = new TrainThread(2, speed2, semaphores, false, sensorToSemaphore);
+			TrainThread train1 = new TrainThread(1, speed1, semaphores, true, sensorToSemaphore, 0);
+			TrainThread train2 = new TrainThread(2, speed2, semaphores, false, sensorToSemaphore, 8);
 
 			train1.start();
 			train2.start();
@@ -65,7 +62,7 @@ public class Lab1 {
 			return 311;
 		case 309:
 		case 509:
-		case 408:
+		case 410:
 			return 409;
 		case 1409:
 		case 1609:
@@ -87,7 +84,7 @@ public class Lab1 {
 		if (switchCoords == 1509 && sensorCoords == 1510) return TSimInterface.SWITCH_LEFT;
 		if (switchCoords == 1509 && nextSem == 4) return TSimInterface.SWITCH_LEFT;
 		if (switchCoords == 1707 && sensorCoords == 1708) return TSimInterface.SWITCH_LEFT;
-		if (switchCoords == 1707 && nextSem == 1) return TSimInterface.SWITCH_LEFT;
+		if (switchCoords == 1707 && nextSem == 0) return TSimInterface.SWITCH_LEFT;
 
 		return TSimInterface.SWITCH_RIGHT;
 	}
@@ -99,50 +96,62 @@ public class Lab1 {
 		private TSimInterface tsi;
 		private boolean toLower;
 		private Hashtable<Integer, SensorMapping> sensorToSemaphore;
+		int currentSemaphore;
 
 
-		TrainThread(int trainNumber, int speed, ArrayList<Semaphore> semaphores, boolean toLower, Hashtable<Integer, SensorMapping> sensorToSemaphore) {
+		TrainThread(int trainNumber, int speed, ArrayList<Semaphore> semaphores, boolean toLower, Hashtable<Integer, SensorMapping> sensorToSemaphore, int currentSemaphore) {
 			this.trainNumber = trainNumber;
 			this.speed = speed;
 			this.semaphores = semaphores;
 			this.tsi = TSimInterface.getInstance();
 			this.toLower = toLower;
 			this.sensorToSemaphore = sensorToSemaphore;
+			this.currentSemaphore = currentSemaphore;
 
 			System.out.println("hello from train " + trainNumber);
 		}
 
 		public void run() {
-			while (true) {
-				try {
-					tsi.setSpeed(trainNumber, speed);
+			try {
+				tsi.setSpeed(trainNumber, speed);
+				while (true) {
 					SensorEvent sensorEvent = tsi.getSensor(trainNumber);
 					if (sensorEvent.getStatus() == SensorEvent.ACTIVE) {
-						//					System.out.println(sensorEvent.toString());
-
 						int x = sensorEvent.getXpos();
 						int y = sensorEvent.getYpos();
-						SensorMapping sMap = sensorToSemaphore.get(x^100+y);
-						//					SemDirTuple[] nextSemDir = sMap.getSemaphore(toLower);
-						//					int[] nextSemaphore = new int[]{nextSemDir[0].nextSemaphore, nextSemDir[1].nextSemaphore};
-						//					int[] nextDirection = new int[]{nextSemDir[0].switchDirection, nextSemDir[1].switchDirection};
+						SensorMapping sMap = sensorToSemaphore.get(x*100+y);
+						int[] nextSemaphores = sMap.getSemaphore(toLower);
 
-						
-/*						if (nextSemaphore[0] == Lab1.STOP) {
+						if (nextSemaphores[0] == Lab1.STOP) {
 							tsi.setSpeed(trainNumber, 0);
-						} else if (nextSemaphore[0] == Lab1.DONOTHING) {
+						} else if (nextSemaphores[0] == Lab1.DONOTHING) {
 
 						} else {
-							for (int i = 0; i < nextSemaphore.length; i++) {
-								if (semaphores.get(nextSemaphore[i]).tryAcquire()) {
-									int swX = sMap.nextSwitchX;
-									int swY = sMap.nextSwitchY;
-									tsi.setSwitch(swX, swY, nextDirection[i]);
-									//tsi.setSwitch(x, y, TSimInterface.SWITCH_LEFT);
-									System.out.println("switch set");
+							boolean reserved = false;
+							for (int i = 0; i < nextSemaphores.length; i++) {
+								System.out.println("nextSemaphore: " + nextSemaphores[i]);
+								if (semaphores.get(nextSemaphores[i]).tryAcquire()) {
+									System.out.println("I have acquired!");
+									reserved = true;
+									semaphores.get(currentSemaphore).release();
+									currentSemaphore = nextSemaphores[i];
+									int nextSemaphore = nextSemaphores[i];
+									int switchCoords = getNextSwitch(x*100+y);
+									int switchDir = getSwitchDirection(switchCoords, x*100+y, nextSemaphore);
+									System.out.println("switchCoords = " + switchCoords);
+									if (switchCoords != 0) {
+										tsi.setSwitch(switchCoords / 100, switchCoords % 100, switchDir);
+										System.out.println("switch set");
+									}
 								}
 							}
-						}*/
+							if (!reserved) {
+								tsi.setSpeed(trainNumber, 0);
+								
+								//acquire next sem
+								//accelerate
+							}
+						}
 						/*					
 					if (semaphores.get(6).tryAcquire()) {
 						tsi.setSwitch(3, 11, TSimInterface.SWITCH_LEFT);
@@ -155,14 +164,13 @@ public class Lab1 {
 					}*/
 					}
 				}
-				catch (CommandException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-				catch (InterruptedException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+			} catch (CommandException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+				System.exit(1);
 			}
 		}
 	}
