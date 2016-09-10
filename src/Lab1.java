@@ -124,6 +124,7 @@ public class Lab1 {
 				System.out.println(trainNumber + ": I have acquired "+ currentSemaphore);
 				tsi.setSpeed(trainNumber, speed);
 				int lastSemaphore = -1;
+				int secondLastSemaphore = -1;
 				while (true) {
 					SensorEvent sensorEvent = tsi.getSensor(trainNumber);
 					int x = sensorEvent.getXpos();
@@ -132,30 +133,31 @@ public class Lab1 {
 					int[] nextSemaphores = sMap.getSemaphore(toLower);
 					
 					if (sensorEvent.getStatus() == SensorEvent.INACTIVE) {
-//						if (nextSemaphores[0] == Lab1.STOP || nextSemaphores[0] == Lab1.DONOTHING) {
 						if (nextSemaphores[0] == Lab1.DONOTHING) {
 							if (lastSemaphore != -1) {
 								if (currentSemaphore != 2) {
-									if (lastSemaphore > 10) {
-										semaphores.get(2).release();
-										System.out.println(trainNumber + ": released 2");
-										lastSemaphore = lastSemaphore % 10;
-									}
 									semaphores.get(lastSemaphore).release();
 									System.out.println(trainNumber + ": released " + lastSemaphore);
+									if (lastSemaphore == 2) {
+										semaphores.get(secondLastSemaphore).release();
+										System.out.println(trainNumber + ": released " + secondLastSemaphore);
+									}
 								} else {
-									System.out.println(trainNumber + ": DOING NOTHING");
+									System.out.println(trainNumber + ": not releasing " + lastSemaphore);
 								}
-							} else
+							} else {
 								System.out.println("lastSemaphore == -1");
+							}
 						}
 					}
 					if (sensorEvent.getStatus() == SensorEvent.ACTIVE) {
 						if (nextSemaphores[0] == Lab1.STOP) {
+							System.out.println("FirstRound = " + firstRound);
 							if (!firstRound) {
 								tsi.setSpeed(trainNumber, 0);
 								sleep(1500);
-								tsi.setSpeed(trainNumber, -1*speed);
+								speed = -1*speed;
+								tsi.setSpeed(trainNumber, speed);
 								toLower = !toLower;
 								toUpper = !toUpper;
 							} else {
@@ -165,24 +167,17 @@ public class Lab1 {
 						} else {
 							boolean acquired = false;
 							for (int i = 0; i < nextSemaphores.length && !acquired; i++) {
-//								System.out.println("nextSemaphore: " + nextSemaphores[i]);
 								if (semaphores.get(nextSemaphores[i]).tryAcquire()) {
 									acquired = true;
-									System.out.println(trainNumber + ": I have acquired! " + nextSemaphores[i]);
-									if (lastSemaphore == 2) {
-										lastSemaphore *= 10;
-										lastSemaphore += currentSemaphore;
-									} else {
-										lastSemaphore = currentSemaphore;
-									}
+									System.out.println(trainNumber + ": I have acquired " + nextSemaphores[i]);
+									secondLastSemaphore = lastSemaphore;
+									lastSemaphore = currentSemaphore;
 									currentSemaphore = nextSemaphores[i];
 									int nextSemaphore = nextSemaphores[i];
 									int switchCoords = getNextSwitch(x*100+y);
 									int switchDir = getSwitchDirection(switchCoords, x*100+y, nextSemaphore);
-//									System.out.println("switchCoords = " + switchCoords);
 									if (switchCoords != 0) {
 										tsi.setSwitch(switchCoords / 100, switchCoords % 100, switchDir);
-//										System.out.println("switch set");
 									}
 								}
 							}
@@ -195,10 +190,8 @@ public class Lab1 {
 								int nextSemaphore = nextSemaphores[0];
 								int switchCoords = getNextSwitch(x*100+y);
 								int switchDir = getSwitchDirection(switchCoords, x*100+y, nextSemaphore);
-								System.out.println("switchCoords = " + switchCoords);
 								if (switchCoords != 0) {
 									tsi.setSwitch(switchCoords / 100, switchCoords % 100, switchDir);
-									System.out.println("switch set");
 								}
 								
 								tsi.setSpeed(trainNumber, speed);
