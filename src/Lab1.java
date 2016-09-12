@@ -113,15 +113,12 @@ public class Lab1 {
 			this.toLower = toLower;
 			this.sensorToSemaphore = sensorToSemaphore;
 			this.currentSemaphore = currentSemaphore;
-
-			System.out.println("hello from train " + trainNumber);
 		}
 		
 		public void run() {
 			try {
 				boolean firstRound = true;
 				semaphores.get(currentSemaphore).acquire();
-				System.out.println(trainNumber + ": I have acquired "+ currentSemaphore);
 				tsi.setSpeed(trainNumber, speed);
 				int lastSemaphore = -1;
 				int secondLastSemaphore = -1;
@@ -138,24 +135,17 @@ public class Lab1 {
 								if (currentSemaphore != 2) {
 									if (lastSemaphore == 2) {
 										semaphores.get(secondLastSemaphore).release();
-										System.out.println(trainNumber + ": released 1 " + secondLastSemaphore);
 									} else {
 										semaphores.get(lastSemaphore).release();
-										System.out.println(trainNumber + ": released 0 " + lastSemaphore);
 									}
 								} else {
-									System.out.println(trainNumber + ": not releasing 2 " + lastSemaphore);
 									semaphores.get(currentSemaphore).release();
-									System.out.println(trainNumber + ": releasing 3 " + currentSemaphore);
 								}
-							} else {
-								System.out.println("lastSemaphore == -1");
 							}
 						}
 					}
 					if (sensorEvent.getStatus() == SensorEvent.ACTIVE) {
 						if (nextSemaphores[0] == Lab1.STOP) {
-							System.out.println("FirstRound = " + firstRound);
 							if (!firstRound) {
 								tsi.setSpeed(trainNumber, 0);
 								if (currentSemaphore == 2) {
@@ -171,13 +161,11 @@ public class Lab1 {
 							} else {
 								firstRound = false;
 							}
-						} else if (nextSemaphores[0] == Lab1.ACQUIRENOTHING) {
-						} else {
+						} else if (nextSemaphores[0] != Lab1.ACQUIRENOTHING) {
 							boolean succesfullyAcquired = false;
 							for (int i = 0; i < nextSemaphores.length && !succesfullyAcquired; i++) {
 								if (semaphores.get(nextSemaphores[i]).tryAcquire()) {
 									succesfullyAcquired = true;
-									System.out.println(trainNumber + ": I have acquired " + nextSemaphores[i]);
 									secondLastSemaphore = lastSemaphore;
 									lastSemaphore = currentSemaphore;
 									currentSemaphore = nextSemaphores[i];
@@ -190,9 +178,7 @@ public class Lab1 {
 							}
 							if (!succesfullyAcquired) {
 								tsi.setSpeed(trainNumber, 0);
-								System.out.println(trainNumber + "Trying to acquire " + nextSemaphores[0]);
 								semaphores.get(nextSemaphores[0]).acquire();
-								System.out.println(trainNumber + " ACQUIRED");
 								secondLastSemaphore = lastSemaphore;
 								lastSemaphore = currentSemaphore;
 								currentSemaphore = nextSemaphores[0];
@@ -209,7 +195,6 @@ public class Lab1 {
 					}
 				}
 			} catch (CommandException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			catch (InterruptedException e) {
@@ -221,7 +206,6 @@ public class Lab1 {
 }
 
 class SensorMapping {
-	// if either of these two is negative, train has to come to a stop
 	int[] acquireIfToUpper;
 	int[] acquireIfToLower;
 	int curSemaphore;
