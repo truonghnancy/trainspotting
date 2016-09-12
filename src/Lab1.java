@@ -22,22 +22,22 @@ public class Lab1 {
 		}
 
 		sensorToSemaphore = new Hashtable<Integer, SensorMapping>();
-		sensorToSemaphore.put(707,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {2}));
-		sensorToSemaphore.put(907,  new SensorMapping(new int[] {2}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(808,  new SensorMapping(new int[] {2}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(806,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {2}));
-		sensorToSemaphore.put(1607, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {3}));
-		sensorToSemaphore.put(1708, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {3}));
-		sensorToSemaphore.put(1807, new SensorMapping(new int[] {0,1}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(1609, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {4,5}));
-		sensorToSemaphore.put(1510, new SensorMapping(new int[] {3}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(1409, new SensorMapping(new int[] {3}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(509,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {6}));
-		sensorToSemaphore.put(410,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {6}));
-		sensorToSemaphore.put(309,  new SensorMapping(new int[] {4,5}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(211,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {7,8}));
-		sensorToSemaphore.put(411,  new SensorMapping(new int[] {6}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(312,  new SensorMapping(new int[] {6}, new int[] {ACQUIRENOTHING}));
+		sensorToSemaphore.put(607,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {2}));
+		sensorToSemaphore.put(1007,  new SensorMapping(new int[] {2}, new int[] {ACQUIRENOTHING}));
+		sensorToSemaphore.put(908,  new SensorMapping(new int[] {2}, new int[] {ACQUIRENOTHING}));
+		sensorToSemaphore.put(805,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {2}));
+		sensorToSemaphore.put(1507, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {3}));
+		sensorToSemaphore.put(1608, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {3}));
+		sensorToSemaphore.put(1907, new SensorMapping(new int[] {0,1}, new int[] {ACQUIRENOTHING}));
+		sensorToSemaphore.put(1709, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {4,5}));
+		sensorToSemaphore.put(1410, new SensorMapping(new int[] {3}, new int[] {ACQUIRENOTHING}));
+		sensorToSemaphore.put(1309, new SensorMapping(new int[] {3}, new int[] {ACQUIRENOTHING}));
+		sensorToSemaphore.put(609,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {6}));
+		sensorToSemaphore.put(510,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {6}));
+		sensorToSemaphore.put(209,  new SensorMapping(new int[] {4,5}, new int[] {ACQUIRENOTHING}));
+		sensorToSemaphore.put(111,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {7,8}));
+		sensorToSemaphore.put(511,  new SensorMapping(new int[] {6}, new int[] {ACQUIRENOTHING}));
+		sensorToSemaphore.put(313,  new SensorMapping(new int[] {6}, new int[] {ACQUIRENOTHING}));
 
 		sensorToSemaphore.put(1403,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
 		sensorToSemaphore.put(1405,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
@@ -61,35 +61,35 @@ public class Lab1 {
 
 	public int getNextSwitch(int sensCoords) {
 		switch(sensCoords) {
-		case 211:
-		case 411:
-		case 312:
+		case 111:
+		case 511:
+		case 313:
 			return 311;
-		case 309:
-		case 509:
-		case 410:
+		case 209:
+		case 609:
+		case 510:
 			return 409;
-		case 1409:
-		case 1609:
+		case 1309:
+		case 1709:
 		case 1508:
-		case 1510:
+		case 1410:
 			return 1509;
-		case 1607:
-		case 1708:
-		case 1807:
+		case 1507:
+		case 1608:
+		case 1907:
 			return 1707;
 		}
 		return 0;
 	}
 
 	public int getSwitchDirection(int switchCoords, int sensorCoords, int nextSem) {
-		if (switchCoords == 311 && sensorCoords == 411) return TSimInterface.SWITCH_LEFT;
+		if (switchCoords == 311 && sensorCoords == 511) return TSimInterface.SWITCH_LEFT;
 		if (switchCoords == 311 && nextSem == 8) return TSimInterface.SWITCH_LEFT;
-		if (switchCoords == 409 && sensorCoords == 509) return TSimInterface.SWITCH_LEFT;
+		if (switchCoords == 409 && sensorCoords == 609) return TSimInterface.SWITCH_LEFT;
 		if (switchCoords == 409 && nextSem == 5) return TSimInterface.SWITCH_LEFT;
-		if (switchCoords == 1509 && sensorCoords == 1510) return TSimInterface.SWITCH_LEFT;
+		if (switchCoords == 1509 && sensorCoords == 1410) return TSimInterface.SWITCH_LEFT;
 		if (switchCoords == 1509 && nextSem == 4) return TSimInterface.SWITCH_LEFT;
-		if (switchCoords == 1707 && sensorCoords == 1708) return TSimInterface.SWITCH_LEFT;
+		if (switchCoords == 1707 && sensorCoords == 1608) return TSimInterface.SWITCH_LEFT;
 		if (switchCoords == 1707 && nextSem == 1) return TSimInterface.SWITCH_LEFT;
 
 		return TSimInterface.SWITCH_RIGHT;
@@ -136,16 +136,17 @@ public class Lab1 {
 						if (nextSemaphores[0] == Lab1.ACQUIRENOTHING) {
 							if (lastSemaphore != -1) {
 								if (currentSemaphore != 2) {
-									semaphores.get(lastSemaphore).release();
-									System.out.println(trainNumber + ": released " + lastSemaphore);
 									if (lastSemaphore == 2) {
 										semaphores.get(secondLastSemaphore).release();
-										System.out.println(trainNumber + ": released TOMATO" + secondLastSemaphore);
+										System.out.println(trainNumber + ": released 1 " + secondLastSemaphore);
+									} else {
+										semaphores.get(lastSemaphore).release();
+										System.out.println(trainNumber + ": released 0 " + lastSemaphore);
 									}
 								} else {
-									System.out.println(trainNumber + ": not releasing " + lastSemaphore);
+									System.out.println(trainNumber + ": not releasing 2 " + lastSemaphore);
 									semaphores.get(currentSemaphore).release();
-									System.out.println(trainNumber + ": releasing " + currentSemaphore);
+									System.out.println(trainNumber + ": releasing 3 " + currentSemaphore);
 								}
 							} else {
 								System.out.println("lastSemaphore == -1");
@@ -162,7 +163,7 @@ public class Lab1 {
 									currentSemaphore = lastSemaphore;
 									lastSemaphore = cache;
 								}
-								sleep(100);
+								sleep(1500);
 								speed = -1*speed;
 								tsi.setSpeed(trainNumber, speed);
 								toLower = !toLower;
