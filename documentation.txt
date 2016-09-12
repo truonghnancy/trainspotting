@@ -1,0 +1,10 @@
+high-level description
+detail about "all pieces of code that are essential for correctness"
+We chose to do 
+
+
+    Placement of the sensors
+    Choice of critical sections
+    Maximum train speed and the reason for it
+    How you tested your solution
+
