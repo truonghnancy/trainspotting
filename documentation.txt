@@ -1,6 +1,10 @@
-high-level description
+High-level Description
+We decided to go with a stateless solution (so the train acts according to which sensors it passes). One of the first issues we realized is we needed some type of data structure to map from sensor coordinates to semaphores & switches. So we decided to make a hashtable with data types <Integer, SensorMapping). The Integer would be the sensor coordinate in one number (x * 100 + y ie (10, 07) -> 1007). The SensorMapping is our own class which holds 2 int arrays (acquireifToLower & acquireifToUpper). Each array contains the index of the sempahore to be acquired (depending on the direction of the train). We chose an array because you could have one or two possible semaphores to choose from. Since we do not always have to acquire a semaphore, we introduce two static variables: ACQUIRENOTHING & STOP. ACQUIRENOTHING is used when you pass a sensor that is directly after a switch. STOP is used when the train is approaching a station. Additionally we needed some type of mapping from sensor coordinate & next sempahore to switch coordinate & switch direction. We accomplished this with two methods (getSwitchDirection & getNextSwitch). These two methods used basic switch & if statements to accomplish their purpose. 
+
+We implemented the majority of our solution in the class TrainThread. This class has the boolean variable toLower which indicates the direction the train is moving in (towards the lower station or not). It also contains the curSemaphore int which is the sempahore that is currently acquired. To help with determining which sempahores to release we also have the ints lastSemaphore & secondLastSemaphore. We have an infinite while loop that waits for the respective train's sensor events. By using getSensor() we avoid busy polling. 
+ 
+
 detail about "all pieces of code that are essential for correctness"
-We chose to do 
 
 
     Placement of the sensors
