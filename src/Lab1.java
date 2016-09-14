@@ -6,8 +6,6 @@ import java.util.*;
 public class Lab1 {
 	static int STOP = -1;
 	static int ACQUIRENOTHING = -2;
-	static Boolean toUpper = true;
-	static Boolean toLower = false;
 	ArrayList<Semaphore> semaphores;
 	private Hashtable<Integer, SensorMapping> sensorToSemaphore;
 
@@ -103,6 +101,8 @@ public class Lab1 {
 		private boolean toLower;
 		private Hashtable<Integer, SensorMapping> sensorToSemaphore;
 		int currentSemaphore;
+		int lastSemaphore = -1;
+		int secondLastSemaphore = -1;
 
 
 		TrainThread(int trainNumber, int speed, ArrayList<Semaphore> semaphores, boolean toLower, Hashtable<Integer, SensorMapping> sensorToSemaphore, int currentSemaphore) {
@@ -120,8 +120,6 @@ public class Lab1 {
 				boolean firstRound = true;
 				semaphores.get(currentSemaphore).acquire();
 				tsi.setSpeed(trainNumber, speed);
-				int lastSemaphore = -1;
-				int secondLastSemaphore = -1;
 				while (true) {
 					SensorEvent sensorEvent = tsi.getSensor(trainNumber);
 					int x = sensorEvent.getXpos();
@@ -157,7 +155,6 @@ public class Lab1 {
 								speed = -1*speed;
 								tsi.setSpeed(trainNumber, speed);
 								toLower = !toLower;
-								toUpper = !toUpper;
 							} else {
 								firstRound = false;
 							}
@@ -208,7 +205,6 @@ public class Lab1 {
 class SensorMapping {
 	int[] acquireIfToUpper;
 	int[] acquireIfToLower;
-	int curSemaphore;
 	
 	public SensorMapping(int[] acquireIfToUpper, int[] acquireIfToLower) {
 		this.acquireIfToLower = acquireIfToLower;
