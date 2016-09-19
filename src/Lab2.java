@@ -2,6 +2,8 @@ import TSim.*;
 import java.util.concurrent.Semaphore;
 import java.lang.InterruptedException;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Condition;
 
 public class Lab2 {
 	static int STOP = -1;
@@ -216,5 +218,19 @@ class SensorMapping {
 		} else {
 			return acquireIfToUpper;
 		}
+	}
+}
+
+
+class Monitor {
+	private final Lock lock = new ReentrantLock();
+	private final Condition notInUse = lock.newCondition();
+	
+	public void enter() {
+		// await the notInUse
+	}
+	
+	public void leave() {
+		// signal the notInUse
 	}
 }
