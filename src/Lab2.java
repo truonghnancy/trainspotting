@@ -9,6 +9,7 @@ public class Lab2 {
 	static int STOP = -1;
 	static int ACQUIRENOTHING = -2;
 	ArrayList<Semaphore> semaphores;
+	ArrayList<Monitor> monitors;
 	private Hashtable<Integer, SensorMapping> sensorToSemaphore;
 
 	public Lab2(Integer speed1, Integer speed2) {
@@ -19,6 +20,11 @@ public class Lab2 {
 		semaphores = new ArrayList<Semaphore>();
 		for(int i = 0; i < 9; i++) {
 			semaphores.add(new Semaphore(1));
+		}
+		
+		monitors = new ArrayList<Monitor>();
+		for(int i = 0; i < 9; i++) {
+			monitors.add(new Monitor((i==0||i==8)));
 		}
 
 		sensorToSemaphore = new Hashtable<Integer, SensorMapping>();
@@ -98,7 +104,7 @@ public class Lab2 {
 	class TrainThread extends Thread {
 		private int speed;
 		private int trainNumber;
-		private ArrayList<Semaphore> semaphores;
+		private ArrayList<Monitor> semaphores;
 		private TSimInterface tsi;
 		private boolean toLower;
 		private Hashtable<Integer, SensorMapping> sensorToSemaphore;
@@ -107,7 +113,7 @@ public class Lab2 {
 		int secondLastSemaphore = -1;
 
 
-		TrainThread(int trainNumber, int speed, ArrayList<Semaphore> semaphores, boolean toLower, Hashtable<Integer, SensorMapping> sensorToSemaphore, int currentSemaphore) {
+		TrainThread(int trainNumber, int speed, ArrayList<Monitor> monitors, boolean toLower, Hashtable<Integer, SensorMapping> sensorToSemaphore, int currentSemaphore) {
 			this.trainNumber = trainNumber;
 			this.speed = speed;
 			this.semaphores = semaphores;
@@ -223,14 +229,31 @@ class SensorMapping {
 
 
 class Monitor {
-	private final Lock lock = new ReentrantLock();
-	private final Condition notInUse = lock.newCondition();
+	private final Lock lock;
+	private final Condition notInUse;
+	private boolean isInUse;
+	
+	public Monitor(boolean inUse) {
+		lock = new ReentrantLock();
+		notInUse = lock.newCondition();
+		isInUse = inUse;
+	}
 	
 	public void enter() {
 		// await the notInUse
+		lock.lock();
+		if (isInUse) {
+			notInUse.await();
+		}
+		isInUse = true;
+		lock.unlock();
 	}
 	
 	public void leave() {
 		// signal the notInUse
+		lock.lock();
+		isInUse = false;
+		notInUse.signal();
+		lock.unlock();
 	}
 }
