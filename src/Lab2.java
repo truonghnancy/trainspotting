@@ -125,7 +125,6 @@ public class Lab2 {
 				tsi.setSpeed(trainNumber, speed);
 				while (true) {
 					SensorEvent sensorEvent = tsi.getSensor(trainNumber);
-					System.out.println(sensorEvent.toString());
 					int x = sensorEvent.getXpos();
 					int y = sensorEvent.getYpos();
 					SensorMapping sMap = sensorToMonitor.get(x*100+y);
@@ -168,7 +167,7 @@ public class Lab2 {
 							if (nextMonitors.length == 2 && monitors.get(nextMonitors[0]).isInUse()) {
 								nextMonitor = nextMonitors[1];
 							}
-//							for (int i = 0; i < nextMonitors.length && !succesfullyAcquired; i++) {
+									tsi.setSpeed(trainNumber, 0);
 									monitors.get(nextMonitor).enter();
 									secondLastMonitor = lastMonitor;
 									lastMonitor = currentMonitor;
@@ -178,22 +177,7 @@ public class Lab2 {
 									if (switchCoords != 0) {
 										tsi.setSwitch(switchCoords / 100, switchCoords % 100, switchDir);
 									}
-//							}
-/*							if (!succesfullyAcquired) {
-								tsi.setSpeed(trainNumber, 0);
-								monitors.get(nextMonitors[0]).enter();
-								secondLastMonitor = lastMonitor;
-								lastMonitor = currentMonitor;
-								currentMonitor = nextMonitors[0];
-								
-								int switchCoords = getNextSwitch(x*100+y);
-								int switchDir = getSwitchDirection(switchCoords, x*100+y, currentMonitor);
-								if (switchCoords != 0) {
-									tsi.setSwitch(switchCoords / 100, switchCoords % 100, switchDir);
-								}
-								
-								tsi.setSpeed(trainNumber, speed);
-							}*/
+									tsi.setSpeed(trainNumber, speed);
 						}
 					}
 				}
