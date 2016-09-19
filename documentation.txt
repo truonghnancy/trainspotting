@@ -15,3 +15,4 @@ Our maximum speed if 15. This is the maximum speed possible when the sensors are
 
 Testing
 To test our solution, we ran the program with different speed combinations. Here is a sample of the speeds we tested (speed of train 1, speed of train 2): (15,15), (15, 10), (15, 5), (5, 15), (5, 5), (10, 10), (15, 1), (10, 15), (15, 0). We also tried to get the trains to come to each switch at the same time to test if the semaphores are being acquired & released correctly (so we watched if the trains stopped to allow another train to pass). We also did this same sort of test with the intersection.
+We also tested if a faster train overtakes a slower train. (e.g. 5 15 1)

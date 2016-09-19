@@ -12,7 +12,6 @@ public class Lab1 {
 	public Lab1(Integer speed1, Integer speed2) {
 		TSimInterface tsi = TSimInterface.getInstance();
 
-
 		tsi.setDebug(false);
 		semaphores = new ArrayList<Semaphore>();
 		for(int i = 0; i < 9; i++) {
@@ -125,7 +124,7 @@ public class Lab1 {
 					int x = sensorEvent.getXpos();
 					int y = sensorEvent.getYpos();
 					SensorMapping sMap = sensorToSemaphore.get(x*100+y);
-					int[] nextSemaphores = sMap.getSemaphore(toLower);
+					int[] nextSemaphores = sMap.getMonitor(toLower);
 					
 					if (sensorEvent.getStatus() == SensorEvent.INACTIVE) {
 						if (nextSemaphores[0] == Lab1.ACQUIRENOTHING) {
@@ -202,7 +201,7 @@ public class Lab1 {
 	}
 }
 
-class SensorMapping {
+class SensorMappping {
 	int[] acquireIfToUpper;
 	int[] acquireIfToLower;
 	

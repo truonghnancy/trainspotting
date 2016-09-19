@@ -1,58 +1,53 @@
 import TSim.*;
-import java.util.concurrent.Semaphore;
 import java.lang.InterruptedException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 public class Lab2 {
 	static int STOP = -1;
 	static int ACQUIRENOTHING = -2;
-	ArrayList<Semaphore> semaphores;
 	ArrayList<Monitor> monitors;
-	private Hashtable<Integer, SensorMapping> sensorToSemaphore;
+	private Hashtable<Integer, SensorMapping> sensorToMonitor;
 
 	public Lab2(Integer speed1, Integer speed2) {
 		TSimInterface tsi = TSimInterface.getInstance();
 
 
 		tsi.setDebug(false);
-		semaphores = new ArrayList<Semaphore>();
-		for(int i = 0; i < 9; i++) {
-			semaphores.add(new Semaphore(1));
-		}
 		
 		monitors = new ArrayList<Monitor>();
 		for(int i = 0; i < 9; i++) {
 			monitors.add(new Monitor((i==0||i==8)));
 		}
 
-		sensorToSemaphore = new Hashtable<Integer, SensorMapping>();
-		sensorToSemaphore.put(607,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {2}));
-		sensorToSemaphore.put(1007,  new SensorMapping(new int[] {2}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(908,  new SensorMapping(new int[] {2}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(805,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {2}));
-		sensorToSemaphore.put(1507, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {3}));
-		sensorToSemaphore.put(1608, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {3}));
-		sensorToSemaphore.put(1907, new SensorMapping(new int[] {0,1}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(1709, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {4,5}));
-		sensorToSemaphore.put(1410, new SensorMapping(new int[] {3}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(1309, new SensorMapping(new int[] {3}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(609,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {6}));
-		sensorToSemaphore.put(510,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {6}));
-		sensorToSemaphore.put(209,  new SensorMapping(new int[] {4,5}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(111,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {7,8}));
-		sensorToSemaphore.put(511,  new SensorMapping(new int[] {6}, new int[] {ACQUIRENOTHING}));
-		sensorToSemaphore.put(313,  new SensorMapping(new int[] {6}, new int[] {ACQUIRENOTHING}));
+		sensorToMonitor = new Hashtable<Integer, SensorMapping>();
+		sensorToMonitor.put(607,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {2}));
+		sensorToMonitor.put(1007,  new SensorMapping(new int[] {2}, new int[] {ACQUIRENOTHING}));
+		sensorToMonitor.put(908,  new SensorMapping(new int[] {2}, new int[] {ACQUIRENOTHING}));
+		sensorToMonitor.put(805,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {2}));
+		sensorToMonitor.put(1507, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {3}));
+		sensorToMonitor.put(1608, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {3}));
+		sensorToMonitor.put(1907, new SensorMapping(new int[] {0,1}, new int[] {ACQUIRENOTHING}));
+		sensorToMonitor.put(1709, new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {4,5}));
+		sensorToMonitor.put(1410, new SensorMapping(new int[] {3}, new int[] {ACQUIRENOTHING}));
+		sensorToMonitor.put(1309, new SensorMapping(new int[] {3}, new int[] {ACQUIRENOTHING}));
+		sensorToMonitor.put(609,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {6}));
+		sensorToMonitor.put(510,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {6}));
+		sensorToMonitor.put(209,  new SensorMapping(new int[] {4,5}, new int[] {ACQUIRENOTHING}));
+		sensorToMonitor.put(111,  new SensorMapping(new int[] {ACQUIRENOTHING}, new int[] {7,8}));
+		sensorToMonitor.put(511,  new SensorMapping(new int[] {6}, new int[] {ACQUIRENOTHING}));
+		sensorToMonitor.put(313,  new SensorMapping(new int[] {6}, new int[] {ACQUIRENOTHING}));
 
-		sensorToSemaphore.put(1403,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
-		sensorToSemaphore.put(1405,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
-		sensorToSemaphore.put(1411,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
-		sensorToSemaphore.put(1413,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
+		sensorToMonitor.put(1403,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
+		sensorToMonitor.put(1405,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
+		sensorToMonitor.put(1411,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
+		sensorToMonitor.put(1413,  new SensorMapping(new int[] {STOP}, new int[] {STOP}));
 
 		try {
-			TrainThread train1 = new TrainThread(1, speed1, semaphores, true, sensorToSemaphore, 0);
-			TrainThread train2 = new TrainThread(2, speed2, semaphores, false, sensorToSemaphore, 8);
+			TrainThread train1 = new TrainThread(1, speed1, monitors, true, sensorToMonitor, 0);
+			TrainThread train2 = new TrainThread(2, speed2, monitors, false, sensorToMonitor, 8);
 			
 			train1.start();
 			train2.start();
@@ -88,15 +83,15 @@ public class Lab2 {
 		return 0;
 	}
 
-	public int getSwitchDirection(int switchCoords, int sensorCoords, int nextSem) {
+	public int getSwitchDirection(int switchCoords, int sensorCoords, int nextMon) {
 		if (switchCoords == 311 && sensorCoords == 511) return TSimInterface.SWITCH_LEFT;
-		if (switchCoords == 311 && nextSem == 8) return TSimInterface.SWITCH_LEFT;
+		if (switchCoords == 311 && nextMon == 8) return TSimInterface.SWITCH_LEFT;
 		if (switchCoords == 409 && sensorCoords == 609) return TSimInterface.SWITCH_LEFT;
-		if (switchCoords == 409 && nextSem == 5) return TSimInterface.SWITCH_LEFT;
+		if (switchCoords == 409 && nextMon == 5) return TSimInterface.SWITCH_LEFT;
 		if (switchCoords == 1509 && sensorCoords == 1410) return TSimInterface.SWITCH_LEFT;
-		if (switchCoords == 1509 && nextSem == 4) return TSimInterface.SWITCH_LEFT;
+		if (switchCoords == 1509 && nextMon == 4) return TSimInterface.SWITCH_LEFT;
 		if (switchCoords == 1707 && sensorCoords == 1608) return TSimInterface.SWITCH_LEFT;
-		if (switchCoords == 1707 && nextSem == 1) return TSimInterface.SWITCH_LEFT;
+		if (switchCoords == 1707 && nextMon == 1) return TSimInterface.SWITCH_LEFT;
 
 		return TSimInterface.SWITCH_RIGHT;
 	}
@@ -104,60 +99,61 @@ public class Lab2 {
 	class TrainThread extends Thread {
 		private int speed;
 		private int trainNumber;
-		private ArrayList<Monitor> semaphores;
+		private ArrayList<Monitor> monitors;
 		private TSimInterface tsi;
 		private boolean toLower;
-		private Hashtable<Integer, SensorMapping> sensorToSemaphore;
-		int currentSemaphore;
-		int lastSemaphore = -1;
-		int secondLastSemaphore = -1;
+		private Hashtable<Integer, SensorMapping> sensorToMonitor;
+		int currentMonitor;
+		int lastMonitor = -1;
+		int secondLastMonitor = -1;
 
 
-		TrainThread(int trainNumber, int speed, ArrayList<Monitor> monitors, boolean toLower, Hashtable<Integer, SensorMapping> sensorToSemaphore, int currentSemaphore) {
+		TrainThread(int trainNumber, int speed, ArrayList<Monitor> monitors, boolean toLower, Hashtable<Integer, SensorMapping> sensorToMonitor, int currentMonitor) {
 			this.trainNumber = trainNumber;
 			this.speed = speed;
-			this.semaphores = semaphores;
+			this.monitors = monitors;
 			this.tsi = TSimInterface.getInstance();
 			this.toLower = toLower;
-			this.sensorToSemaphore = sensorToSemaphore;
-			this.currentSemaphore = currentSemaphore;
+			this.sensorToMonitor = sensorToMonitor;
+			this.currentMonitor = currentMonitor;
 		}
 		
 		public void run() {
 			try {
 				boolean firstRound = true;
-				semaphores.get(currentSemaphore).acquire();
+				monitors.get(currentMonitor).enter();
 				tsi.setSpeed(trainNumber, speed);
 				while (true) {
 					SensorEvent sensorEvent = tsi.getSensor(trainNumber);
+					System.out.println(sensorEvent.toString());
 					int x = sensorEvent.getXpos();
 					int y = sensorEvent.getYpos();
-					SensorMapping sMap = sensorToSemaphore.get(x*100+y);
-					int[] nextSemaphores = sMap.getSemaphore(toLower);
+					SensorMapping sMap = sensorToMonitor.get(x*100+y);
+					int[] nextMonitors = sMap.getMonitor(toLower);
 					
 					if (sensorEvent.getStatus() == SensorEvent.INACTIVE) {
-						if (nextSemaphores[0] == Lab2.ACQUIRENOTHING) {
-							if (lastSemaphore != -1) {
-								if (currentSemaphore != 2) {
-									if (lastSemaphore == 2) {
-										semaphores.get(secondLastSemaphore).release();
+						if (nextMonitors[0] == Lab2.ACQUIRENOTHING) {
+							if (lastMonitor != -1) {
+								if (currentMonitor != 2) {
+									if (lastMonitor == 2) {
+										monitors.get(secondLastMonitor).leave();
 									} else {
-										semaphores.get(lastSemaphore).release();
+										monitors.get(lastMonitor).leave();
 									}
 								} else {
-									semaphores.get(currentSemaphore).release();
+									monitors.get(currentMonitor).leave();
 								}
 							}
 						}
 					}
 					if (sensorEvent.getStatus() == SensorEvent.ACTIVE) {
-						if (nextSemaphores[0] == Lab2.STOP) {
+						if (nextMonitors[0] == Lab2.STOP) {
 							if (!firstRound) {
 								tsi.setSpeed(trainNumber, 0);
-								if (currentSemaphore == 2) {
-									int cache = currentSemaphore;
-									currentSemaphore = lastSemaphore;
-									lastSemaphore = cache;
+								if (currentMonitor == 2) {
+									int cache = currentMonitor;
+									currentMonitor = lastMonitor;
+									lastMonitor = cache;
 								}
 								sleep(1500);
 								speed = -1*speed;
@@ -166,36 +162,38 @@ public class Lab2 {
 							} else {
 								firstRound = false;
 							}
-						} else if (nextSemaphores[0] != Lab2.ACQUIRENOTHING) {
+						} else if (nextMonitors[0] != Lab2.ACQUIRENOTHING) {
 							boolean succesfullyAcquired = false;
-							for (int i = 0; i < nextSemaphores.length && !succesfullyAcquired; i++) {
-								if (semaphores.get(nextSemaphores[i]).tryAcquire()) {
-									succesfullyAcquired = true;
-									secondLastSemaphore = lastSemaphore;
-									lastSemaphore = currentSemaphore;
-									currentSemaphore = nextSemaphores[i];
+							int nextMonitor = nextMonitors[0];
+							if (nextMonitors.length == 2 && monitors.get(nextMonitors[0]).isInUse()) {
+								nextMonitor = nextMonitors[1];
+							}
+//							for (int i = 0; i < nextMonitors.length && !succesfullyAcquired; i++) {
+									monitors.get(nextMonitor).enter();
+									secondLastMonitor = lastMonitor;
+									lastMonitor = currentMonitor;
+									currentMonitor = nextMonitor;
 									int switchCoords = getNextSwitch(x*100+y);
-									int switchDir = getSwitchDirection(switchCoords, x*100+y, currentSemaphore);
+									int switchDir = getSwitchDirection(switchCoords, x*100+y, currentMonitor);
 									if (switchCoords != 0) {
 										tsi.setSwitch(switchCoords / 100, switchCoords % 100, switchDir);
 									}
-								}
-							}
-							if (!succesfullyAcquired) {
+//							}
+/*							if (!succesfullyAcquired) {
 								tsi.setSpeed(trainNumber, 0);
-								semaphores.get(nextSemaphores[0]).acquire();
-								secondLastSemaphore = lastSemaphore;
-								lastSemaphore = currentSemaphore;
-								currentSemaphore = nextSemaphores[0];
+								monitors.get(nextMonitors[0]).enter();
+								secondLastMonitor = lastMonitor;
+								lastMonitor = currentMonitor;
+								currentMonitor = nextMonitors[0];
 								
 								int switchCoords = getNextSwitch(x*100+y);
-								int switchDir = getSwitchDirection(switchCoords, x*100+y, currentSemaphore);
+								int switchDir = getSwitchDirection(switchCoords, x*100+y, currentMonitor);
 								if (switchCoords != 0) {
 									tsi.setSwitch(switchCoords / 100, switchCoords % 100, switchDir);
 								}
 								
 								tsi.setSpeed(trainNumber, speed);
-							}
+							}*/
 						}
 					}
 				}
@@ -218,7 +216,7 @@ class SensorMapping {
 		this.acquireIfToLower = acquireIfToLower;
 		this.acquireIfToUpper = acquireIfToUpper;
 	}
-	public int[] getSemaphore(boolean toLower) {
+	public int[] getMonitor(boolean toLower) {
 		if (toLower) {
 			return acquireIfToLower;
 		} else {
@@ -236,14 +234,19 @@ class Monitor {
 	public Monitor(boolean inUse) {
 		lock = new ReentrantLock();
 		notInUse = lock.newCondition();
-		isInUse = inUse;
+		isInUse = false;
 	}
 	
 	public void enter() {
 		// await the notInUse
 		lock.lock();
 		if (isInUse) {
-			notInUse.await();
+			try {
+				notInUse.await();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		isInUse = true;
 		lock.unlock();
@@ -255,5 +258,9 @@ class Monitor {
 		isInUse = false;
 		notInUse.signal();
 		lock.unlock();
+	}
+	
+	public boolean isInUse() {
+		return isInUse;
 	}
 }
