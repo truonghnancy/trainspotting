@@ -6,7 +6,7 @@ public class Main {
 
 	/**
 	 * The main method expects 3-4 arguments, e.g.:
-	 * - command line: java -cp bin Main "Lab1.map" 5 10 20
+	 * - command line: java -cp bin Main "Lab2.map" 5 10 20
 	 * -   in Eclipse: add them from Run Configurations -> Arguments
 	 */
 	public static void main(String[] args) {
@@ -20,12 +20,12 @@ public class Main {
 			Process p = Runtime.getRuntime().exec(tsimCommand);
 			TSimInterface.init(p.getInputStream(), p.getOutputStream());
 			TSimInterface.getInstance().setDebug(true);
-			new Lab1(train1_speed, train2_speed);
+			new Lab2(train1_speed, train2_speed);
 			// new Lab2(train1_speed, train2_speed);
 			p.waitFor();
 			
 		} catch (ArrayIndexOutOfBoundsException e) {
-			System.err.println("Main method expects 3-4 arguments: Lab1.map <Train1Speed> <Train2Speed> [SimulatorSpeed]");
+			System.err.println("Main method expects 3-4 arguments: Lab2.map <Train1Speed> <Train2Speed> [SimulatorSpeed]");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
