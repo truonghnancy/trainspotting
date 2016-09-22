@@ -1,9 +1,11 @@
 
 What is the purpose of each method in the monitor?
 - enter()
+This method is used to lock the monitor when a train is attempting to enter a critical section. It accomplishes this by using the lock() method. However if the critical section for the current monitor is already being used, it is blocked using await() from the noInUse condition.
 - leave()
-
+This method is used to release a critical section when a train leaves. It also signals the notInUse condition so that awaiting trains can be awoken.
 - isInUse()
-The isInUse() method returns the variable isInUse which is true when the critical section for that monitor is currently being used and false if it is not in use. We use this method to know(figure out?) if the train needs to check the other track for availability.
+The isInUse() method returns the variable isInUse which is true when the critical section for that monitor is currently being used and false if it is not in use. We use this method to figure out if the train needs to check the other track for availability.
 
 How many conditional variables, if any, are needed in your solution? Justify your answer.
+We need one conditional variable for every monitor so we need 9 total for our solution. Each conditional varaible tells us if a piece of track is available which is why one for each critical section.
