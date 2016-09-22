@@ -1,1 +1,9 @@
 
+What is the purpose of each method in the monitor?
+- enter()
+- leave()
+
+- isInUse()
+The isInUse() method returns the variable isInUse which is true when the critical section for that monitor is currently being used and false if it is not in use. We use this method to know(figure out?) if the train needs to check the other track for availability.
+
+How many conditional variables, if any, are needed in your solution? Justify your answer.
